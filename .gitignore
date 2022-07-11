@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# custom folders
+website
+.idea
+no_release
+
 # C extensions
 *.so
 
