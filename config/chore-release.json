@@ -1,0 +1,87 @@
+{
+  "exp_name": "chore-release",
+  "test_kid": 1,
+  "image_size": [
+    2048,
+    1536
+  ],
+  "net_img_size": [
+    512,
+    512
+  ],
+  "batch_size": 15,
+  "learning_rate": 0.001,
+  "learning_rateC": 0.001,
+  "num_epochs": 80,
+  "num_samples_train": 20000,
+  "multi_gpus": true,
+  "split_file": "splits/behave-split.pkl",
+  "clamp_thres": 0.1,
+  "mix_samp": true,
+  "sigmas": [
+    0.08,
+    0.02,
+    0.003
+  ],
+  "person_obj_ratio": [
+    0.5,
+    0.5
+  ],
+  "ratios": [
+    0.01,
+    0.49,
+    0.5
+  ],
+  "loadSize": 1200,
+  "name": "chore",
+  "gpu_id": 0,
+  "gpu_ids": [
+    0
+  ],
+  "num_workers": 32,
+  "data_name": "scale",
+  "sigma": 5.0,
+  "num_sample_inout": 5000,
+  "num_sample_color": 0,
+  "z_size": 200.0,
+  "z_0": 2.2,
+  "model_type": "comb",
+  "input_type": "RGBM3",
+  "encode_type": "normal_hg",
+  "surface_classifier": false,
+  "norm": "group",
+  "norm_color": "instance",
+  "num_stack": 5,
+  "num_hourglass": 2,
+  "skip_hourglass": true,
+  "hg_down": "ave_pool",
+  "hourglass_dim": 256,
+  "mlp_dim": [
+    257,
+    1024,
+    512,
+    256,
+    128,
+    1
+  ],
+  "mlp_dim_color": [
+    513,
+    1024,
+    512,
+    256,
+    128,
+    3
+  ],
+  "use_tanh": false,
+  "random_flip": false,
+  "random_trans": false,
+  "random_scale": false,
+  "no_residual": false,
+  "aug_blur": 0.0,
+  "milestones": [15, 25],
+  "z_feat": "xyz",
+  "projection_mode": "perspective",
+  "filter_val": 0.004,
+  "sparse_thres": 0.03,
+  "seq_folder": null
+}

@@ -119,8 +119,9 @@ If you use our code, please cite:
 @inproceedings{xie2022chore,
     title = {CHORE: Contact, Human and Object REconstruction from a single RGB image},
     author = {Xie, Xianghui and Bhatnagar, Bharat Lal and Pons-Moll, Gerard},
-    booktitle = {ECCV},
+    booktitle = {European Conference on Computer Vision ({ECCV})},
     month = {October},
+    organization = {{Springer}},
     year = {2022},
 }
 ```

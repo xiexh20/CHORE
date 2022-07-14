@@ -1,0 +1,12 @@
+# Set all the paths here.
+# Author: Xianghui Xie
+# Cite: CHORE: Contact, Human and Object REconstruction from a single RGB image, ECCV'2022
+
+CODE: "/BS/xxie-2/work/chore" # path to your project main folder
+BEHAVE_PATH: "/BS/xxie-5/static00/behave_release/sequences" # root path where BEHAVE sequences are stored
+PROCESSED_PATH: "/BS/xxie-5/static00/behave-train" # root path where processed data are saved
+RECON_PATH: "/BS/xxie-5/static00/newdata" # root path where reconstruction results will be saved
+
+# paths to SMPL libs
+SMPL_ASSETS_ROOT: "assets"
+SMPL_MODEL_ROOT: "/BS/xxie2020/static00/mysmpl/smplh"

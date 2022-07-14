@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .BasePIFuNet import BasePIFuNet
 from .HGFilters import HGFilter
-from ..net_util import init_weights
+from model.net_util import init_weights
 from .camera import KinectColorCamera
 
 
@@ -27,6 +27,7 @@ class CHORE(BasePIFuNet):
             error_term=error_term)
         self.opt = opt
         self.name = 'chore'
+        self.device = torch.device(opt.gpu_id)
 
         self.image_filter = HGFilter(opt)  # encoder
 
@@ -34,59 +35,41 @@ class CHORE(BasePIFuNet):
         self.im_feat_list = []
         self.tmpx = None
         self.normx = None
-
         self.intermediate_preds_list = []
 
         self.z_feat = opt.z_feat
         assert self.z_feat in ['zcat', 'zcat2', 'zcat3', 'zcat4', 'zcat5', 'xyz']  # use combined z feature
-        print('zfeat: ', self.z_feat)
 
         assert self.z_feat == 'xyz'
         zfeat_size = 3
         feature_size = 256 + zfeat_size + 256 // 4
 
-        self.feature_size = feature_size
-
+        # Decoders
         # Human + Object DF predictor
         self.df = self.make_decoder(feature_size, 2, 1, hidden_dim)
-
         # per-part correspondence predictor
         self.part_predictor = self.make_decoder(feature_size, num_parts, 1, hidden_dim)
-
         # object pca_axis predictor
         self.pca_predictor = self.make_decoder(feature_size, 9, 1, hidden_dim)
-
         # smpl center and obj center decoder
-        self.center_predictor = self.make_decoder(self.feature_size, 6, 1, hidden_dim)
+        self.center_predictor = self.make_decoder(feature_size, 6, 1, hidden_dim)
 
-        self.device = torch.device(opt.gpu_id)
-
-        self.camera = KinectColorCamera(opt.loadSize)
-
-        self.point_fc = nn.Conv1d(3, 1, 1)  # one layer to encode point coordinate info
         # loss functions
         self.rank = rank  # for distributed training
-
         self.dfloss_func = nn.L1Loss(reduction='none').cuda(self.rank)  # use udf loss
-
         self.part_loss_func = nn.CrossEntropyLoss(reduction='none').cuda(self.rank)
+        # default loss weights for dfh, dfo, parts, pca,  smpl, obj, gradh grado
+        self.loss_weights = [1.0, 1.0, 0.006, 500, 1000, 1000]
 
+        self.camera = KinectColorCamera(opt.loadSize)
         self.OUT_DIST = 5.0  # value for points outside the image plane
 
         init_weights(self)
-        self.error_buffer = None  # buffer to save errors
 
         # buffer for error computation
         self.points = None
-        self.offsets = None
         self.crop_center = None
-        self.obj_center = None
-
-        # for gradient computation
-        self.point_local_feats = []
-
-        # default loss weights for dfh, dfo, parts, pca,  smpl, obj, gradh grado
-        self.loss_weights = [1.0, 1.0, 0.006, 500, 1000, 1000]
+        self.error_buffer = None
 
     def make_decoder(self, input_sz, output_sz, group_sz, hidden_sz):
         # per-part occupancy predictor
@@ -151,17 +134,13 @@ class CHORE(BasePIFuNet):
             tmpx_local_feature = self.index(self.tmpx, xy)
 
         self.intermediate_preds_list = []
-        point_local_feats = []
 
         for im_feat in self.im_feat_list:
             point_local_feat_list = [self.index(im_feat, xy), z_feat]
             if self.opt.skip_hourglass:  # use skip connection? yes!
                 point_local_feat_list.append(tmpx_local_feature)
 
-            point_local_feat = torch.cat(point_local_feat_list, 1)  # dimension of feature size?
-
-            point_local_feats.append(point_local_feat)  # for gradient computation
-
+            point_local_feat = torch.cat(point_local_feat_list, 1)
             preds = self.decode(point_local_feat)
 
             # out of image plane is always set to a maximum
@@ -172,7 +151,6 @@ class CHORE(BasePIFuNet):
 
             self.intermediate_preds_list.append((df, *preds[1:]))
 
-        self.point_local_feats = point_local_feats
         self.preds = self.intermediate_preds_list[-1]
 
     def decode(self, features):
@@ -194,9 +172,6 @@ class CHORE(BasePIFuNet):
         :return: [B, C_feat, H, W] image feature after filtering
         '''
         return self.im_feat_list[-1]
-
-    def get_separate_losses(self):
-        return self.error_buffer
 
     def forward(self, images, points, df_h, df_o, parts_gt, pca_gt, body_center=None,
                 max_dist=5.0, obj_center=None, crop_center=None,
@@ -224,19 +199,11 @@ class CHORE(BasePIFuNet):
         losses_all, error = 0.0, 0.
         for preds in self.intermediate_preds_list:
             df_pred, pca_pred, parts_pred, centers = preds
-            if self.opt.joint_df:
-                df_joint = df_h
-                obj_mask = df_o < df_h
-                df_joint[obj_mask] = df_o[obj_mask]
-                loss_df = self.get_df_loss(df_pred, df_joint, max_dist)
-                loss_h = loss_df * 2.5
-                loss_o = 0.
-            else:
-                # separate distance field to human and object
-                df_h_pred = df_pred[:, 0]  # (B, N)
-                df_o_pred = df_pred[:, 1]
-                loss_h = self.get_df_loss(df_h, df_h_pred, max_dist) * self.loss_weights[0]
-                loss_o = self.get_df_loss(df_o, df_o_pred, max_dist) * self.loss_weights[1]
+            # separate distance fields to human and object
+            df_h_pred = df_pred[:, 0]  # (B, N)
+            df_o_pred = df_pred[:, 1]
+            loss_h = self.get_df_loss(df_h, df_h_pred, max_dist) * self.loss_weights[0]
+            loss_o = self.get_df_loss(df_o, df_o_pred, max_dist) * self.loss_weights[1]
 
             # loss_parts = self.part_loss_func(parts_pred, parts_gt) * 0.1
             loss_parts = self.part_loss_func(parts_pred, parts_gt) * self.loss_weights[2]
@@ -244,8 +211,6 @@ class CHORE(BasePIFuNet):
 
             # PCA axis loss
             mask = (df_o < 0.05).unsqueeze(1).unsqueeze(1)  # (B, N), pca_gt: (B, 3, 3, N)
-            # print('pca_pred shape: {}, gt shape: {}'.format(pca_pred.shape, pca_gt.shape))
-            # loss_pca = (F.mse_loss(pca_pred, pca_gt, reduction='none') * mask) * 10. ** 3
             loss_pca = (F.mse_loss(pca_pred, pca_gt, reduction='none') * mask) * self.loss_weights[3]
             loss_pca = loss_pca.mean()
 
@@ -255,7 +220,6 @@ class CHORE(BasePIFuNet):
 
             # smpl center prediction loss
             mask = (df_h < 0.05).unsqueeze(1)  # (B, N) -> (B, 1, N)
-            # print("mask: {}, centers: {}".format(mask.shape, body_center.shape))
             B, _, N = mask.shape[:3]
             loss_smpl_center = (F.mse_loss(centers[:, :3, :], body_center.unsqueeze(-1).repeat(1, 1, N),
                                            reduction='none') * mask)
