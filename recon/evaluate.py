@@ -46,7 +46,7 @@ class ReconEvaluator:
     def eva_seq(self, seq, save_name, tid, etype='ours', smpl_only=False):
         reader = ReconDataReader(self.recon_path, seq)
         seq_end = reader.cvt_end(None)
-        check_occ = False
+        check_occ = True
         errors_all = []
         for i in range(0, seq_end, 1):
             if check_occ:
@@ -73,9 +73,9 @@ class ReconEvaluator:
                 raise NotImplemented
             if smpl_recon is None:
                 continue
-            if smpl_only: # only evaluate SMPL mesh
-                recon_meshes = recon_meshes[:1]
-                gt_meshes = gt_meshes[:1]
+            # if smpl_only: # only evaluate SMPL mesh
+            #     recon_meshes = recon_meshes[:1]
+            #     gt_meshes = gt_meshes[:1]
             try:
                 recon_aligned = self.align.align_meshes(gt_meshes, recon_meshes)
             except Exception as e:
@@ -100,6 +100,7 @@ class ReconEvaluator:
         errors = []
         for gt, recon in zip(gt_points, aligned_points):
             err = self.chamfer_dist(gt, recon)
+            # err = self.v2v_err(gt, recon)
             errors.append(err)
         errors.append(0.)
         return errors
@@ -209,7 +210,7 @@ def main(args):
     BEHAVE_PATH = paths['BEHAVE_PATH']
     RECON_PATH = paths['RECON_PATH']
 
-    evaluator = ReconEvaluator(RECON_PATH, BEHAVE_PATH)
+    evaluator = ReconEvaluator(RECON_PATH, BEHAVE_PATH, smpl_only = args.id == 'smpl')
     evaluator.eval_seqs(args.split, args.save_name, args.tid, args.method, args.id)
 
 
