@@ -114,7 +114,7 @@ class TestData(BaseDataset):
         outfile = rgb_file.replace(f".color.jpg", '.crop_info.pkl')
         if not isfile(outfile):
             crop_info = {
-                'rgb_newsize': np.array([2048, 1536]),
+                'rgb_newsize': np.array(newsize),
                 "resize_scale": resize_scale,
                 "crop_center": old_center,
                 "crop_scale": scale,
