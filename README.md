@@ -2,7 +2,7 @@
 #### Official implementation of the ECCV 2022 paper: Contact, Human and Object REconstruction from a single RGB image
 [[ArXiv]](https://arxiv.org/abs/2204.02445) [[Project Page]](http://virtualhumans.mpi-inf.mpg.de/chore)
 <p align="left">
-<img src="https://virtualhumans.mpi-inf.mpg.de/chore/teaser.gif" alt="teaser" width="720"/>
+<img src="https://virtualhumans.mpi-inf.mpg.de/chore/teaser.gif" alt="teaser" width="512"/>
 </p>
 
 
