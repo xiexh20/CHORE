@@ -11,8 +11,8 @@
 2. [Run demo](#run-demo)
 3. [Training](#training)
 4. [Testing](#testing)
-5. [License](#license)
-6. [Citation](#citation)
+5. [Citation](#citation)
+6. [License](#license)
 
 
 ## Dependencies
@@ -56,6 +56,8 @@ Pretrained model can be downloaded from [here](https://nextcloud.mpi-klsb.mpg.de
 
 We use the SMPL-H body model, please prepare it from the [official website](https://mano.is.tue.mpg.de/) and modify `SMPL_MODEL_ROOT` in `PATHS.yml` accordingly.
 
+This demo also requires the object templates from [BEHAVE dataset](http://virtualhumans.mpi-inf.mpg.de/behave/). Download the object templates from [here](https://datasets.d2.mpi-inf.mpg.de/cvpr22behave/objects.zip) and modify `BEHAVE_PATH` in file `PATHS.yml` accordingly.   
+
 Run demo example with: 
 ```shell
 python demo.py chore-release -s example -on basketball 
@@ -97,22 +99,6 @@ Run the following to compute errors reported in table 1:
 python recon/evaluate.py 
 ```
 
-## License
-Copyright (c) 2022 Xianghui Xie, Max-Planck-Gesellschaft
-
-Please read carefully the following terms and conditions and any accompanying documentation before you download and/or use this software and associated documentation files (the "Software").
-
-The authors hereby grant you a non-exclusive, non-transferable, free of charge right to copy, modify, merge, publish, distribute, and sublicense the Software for the sole purpose of performing non-commercial scientific research, non-commercial education, or non-commercial artistic projects.
-
-Any other use, in particular any use for commercial purposes, is prohibited. This includes, without limitation, incorporation in a commercial product, use in a commercial service, or production of other artefacts for commercial purposes.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-You understand and agree that the authors are under no obligation to provide either maintenance services, update services, notices of latent defects, or corrections of defects with regard to the Software. The authors nevertheless reserve the right to update, modify, or discontinue the Software at any time.
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. You agree to cite the **CHORE: Contact, Human and Object REconstruction from a single RGB image** paper in documents and papers that report on research using this Software.
-
-
 ## Citation
 If you use our code, please cite:
 ```bibtex
@@ -136,6 +122,23 @@ If you use BEHAVE dataset, please also cite:
     year = {2022},
     }
 ```
+
+## License
+Copyright (c) 2022 Xianghui Xie, Max-Planck-Gesellschaft
+
+Please read carefully the following terms and conditions and any accompanying documentation before you download and/or use this software and associated documentation files (the "Software").
+
+The authors hereby grant you a non-exclusive, non-transferable, free of charge right to copy, modify, merge, publish, distribute, and sublicense the Software for the sole purpose of performing non-commercial scientific research, non-commercial education, or non-commercial artistic projects.
+
+Any other use, in particular any use for commercial purposes, is prohibited. This includes, without limitation, incorporation in a commercial product, use in a commercial service, or production of other artefacts for commercial purposes.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+You understand and agree that the authors are under no obligation to provide either maintenance services, update services, notices of latent defects, or corrections of defects with regard to the Software. The authors nevertheless reserve the right to update, modify, or discontinue the Software at any time.
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. You agree to cite the **CHORE: Contact, Human and Object REconstruction from a single RGB image** paper in documents and papers that report on research using this Software.
+
+
 
 
 
