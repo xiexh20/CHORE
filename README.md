@@ -6,6 +6,8 @@
 </p>
 
 
+## News: our new CVPR'23 paper that can track human and object consistently from monocular videos. [Check out here!](https://github.com/xiexh20/VisTracker)
+
 ## Contents
 1. [Dependencies](#dependencies)
 2. [Run demo](#run-demo)
