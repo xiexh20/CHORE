@@ -52,7 +52,11 @@ class DataPaths:
         count = 0
         for img_file in image_files:
             mask_file = img_file.replace('.color.jpg', '.obj_rend_mask.jpg')
+            if not os.path.isfile(mask_file):
+                mask_file = img_file.replace('.color.jpg', '.obj_rend_mask.png')
             full_mask_file = img_file.replace('.color.jpg', '.obj_rend_full.jpg')
+            if not os.path.isfile(full_mask_file):
+                full_mask_file = img_file.replace('.color.jpg', '.obj_rend_full.png')
             if not isfile(mask_file) or not isfile(full_mask_file):
                 continue
 

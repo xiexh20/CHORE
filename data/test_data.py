@@ -121,7 +121,7 @@ class TestData(BaseDataset):
                 "crop_size": crop_size
             }
             pkl.dump(crop_info, open(outfile, 'wb'))
-
+            # print('saved to', outfile)
         return images.transpose((2, 0, 1)).astype(self.dtype), crop_center, resize_scale, scale, old_center
 
     def change_crop_center(self, crop_center):

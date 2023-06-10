@@ -160,11 +160,32 @@ class ReconFitterBase:
         :return: relative rotation from template to target
         """
         pseudo = ReconFitterBase.inverse(src_axis)
-        rot = torch.bmm(pseudo, tgt_axis) + 1e-4 * torch.rand(pseudo.shape[0], 3, 3).to(pseudo.device) # avoid convergence problem
-        # return rotation matrix directly
-        U, S, V = torch.svd(rot)
-        R = torch.bmm(U, V.transpose(2, 1))
-        return R
+        rot = torch.bmm(pseudo, tgt_axis)
+
+        return ReconFitterBase.decopose_axis(rot)
+
+    @staticmethod
+    def project_so3(mat):
+        """
+        project 3x3 matrix to SO(3) real
+        Args:
+            mat: (B, 3, 3)
+
+        Returns: (B, 3, 3) real rotation matrix
+        References: https://github.com/amakadia/svd_for_pose
+
+        this does: US'V^T, where S'=diag(1, ..., 1, det(UV^T)), symmetric orthogonalization that project a matrix to SO(3)
+        however, this operation is not orientation preserving when det(UV^T)<=0
+
+        """
+        assert mat.shape[1:] == (3, 3), f'invalid shape {mat.shape}'
+        u, s, v = torch.svd(mat)
+        vt = torch.transpose(v, 1, 2)
+        det = torch.det(torch.matmul(u, vt))
+        det = det.view(-1, 1, 1)
+        vt = torch.cat((vt[:, :2, :], vt[:, -1:, :] * det), 1)
+        r = torch.matmul(u, vt)
+        return r
 
     @staticmethod
     def inverse(mat):
@@ -241,6 +262,8 @@ class ReconFitterBase:
         B = len(obj_files)
         obj_verts = torch.tensor(self.scan.v, dtype=torch.float32).repeat(B, 1, 1).to(self.device)
         obj_verts = self.transform_object(obj_verts, obj_R, obj_t, obj_s)
+
+        obj_R = self.decopose_axis(obj_R, no_rand=True) # save rotation matrix
         verts = obj_verts.detach().cpu().numpy()
         for v, p, r, s, t in zip(verts, obj_files, obj_R.detach().cpu().numpy(), obj_s.detach().cpu().numpy(), obj_t.detach().cpu().numpy()):
             m = Mesh(v=v, f=self.scan.f)
@@ -347,12 +370,17 @@ class ReconFitterBase:
         verts = verts * obj_s.unsqueeze(1).unsqueeze(1)
         return verts
 
-    def decopose_axis(self, rot):
-        "project 3x3 matrix to SO(3)"
-        rot = rot + 1e-4 * torch.rand(rot.shape[0], 3, 3).to(rot.device)
-        U, S, V = torch.svd(rot)
-        R = torch.bmm(U, V.transpose(2, 1))
-        return R
+    def decopose_axis(self, rot, no_rand=False):
+        """
+        project 3x3 matrix to SO(3)
+        :param rot: (B, 3, 3), predicted/optimized rotation matrix
+        :param no_rand: add random noise to the matrix (prevent SVD divengence) or not
+        :return: (B, 3, 3) rotation matrix in SO(3)
+        """
+        if no_rand:
+            return ReconFitterBase.project_so3(rot)
+        else:
+            return ReconFitterBase.project_so3(rot + 1e-4 * torch.rand(rot.shape[0], 3, 3).to(rot.device))
 
     def prepare_query_dict(self, batch):
         """

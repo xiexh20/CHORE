@@ -6,7 +6,7 @@ __pycache__/
 # custom folders
 website
 .idea
-no_release
+scripts
 
 # C extensions
 *.so

@@ -70,9 +70,13 @@ class BaseDataset(Dataset):
 
     def load_masks(self, rgb_file, flip=False):
         person_mask_file = rgb_file.replace('.color.jpg', ".person_mask.jpg")
+        if not osp.isfile(person_mask_file):
+            person_mask_file = rgb_file.replace('.color.jpg', ".person_mask.png")
         obj_mask_file = rgb_file.replace('.color.jpg', ".obj_rend_mask.jpg")
         if not osp.isfile(obj_mask_file):
             obj_mask_file = rgb_file.replace('.color.jpg', ".obj_mask.jpg")
+            if not osp.isfile(obj_mask_file):
+                obj_mask_file = rgb_file.replace('.color.jpg', ".obj_mask.png")
         person_mask = cv2.imread(person_mask_file, cv2.IMREAD_GRAYSCALE)
         obj_mask = cv2.imread(obj_mask_file, cv2.IMREAD_GRAYSCALE)
 

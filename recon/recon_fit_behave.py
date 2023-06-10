@@ -77,14 +77,14 @@ class ReconFitterBehave(ReconFitterBase):
 
     def init_dataloader(self, args):
         batch_size = args.batch_size
-        image_files = DataPaths.get_image_paths_seq(self.seq_folder, check_occlusion=True)
+        image_files = DataPaths.get_image_paths_seq(self.seq_folder, args.test_kid, check_occlusion=True)
         batch_end = args.end if args.end is not None else len(image_files)
         image_files = image_files[args.start:batch_end]
         dataset = TestData(image_files, batch_size, batch_size,
                            image_size=args.net_img_size,
                            crop_size=args.loadSize)
         loader = dataset.get_loader(shuffle=False)
-        print(f"In total {len(loader)} test examples")
+        print(f"In total {len(image_files)} test examples")
         return loader
 
     def optimize_smpl_object(self, model, data_dict, obj_iter=20, joint_iter=10, steps_per_iter=10):

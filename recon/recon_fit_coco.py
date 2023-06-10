@@ -27,7 +27,7 @@ class ReconFitterCoco(ReconFitterBehave):
                            crop_size=args.loadSize,
                            use_mean_center=True) # move human object patch to mean crop center in training dataset
         loader = dataset.get_loader(shuffle=False)
-        print(f"In total {len(loader)} test examples")
+        print(f"In total {len(loader)} batches, {len(image_files)} test examples")
         return loader
 
     def scale_body_kpts(self, kpts, resize_scale, crop_scale, old_crop_center):
@@ -103,6 +103,8 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--display', default=False, action='store_true')
     parser.add_argument('-fs', '--start', default=0, type=int, help='start fitting from which frame')
     parser.add_argument('-fe', '--end', default=None, type=int, help='end fitting at which frame')
+    parser.add_argument('-on', '--obj_name', default=None,
+                        help='object category name, if not provided, will load from sequence information file')
 
     args = parser.parse_args()
 
