@@ -370,6 +370,7 @@ class ReconFitterBase:
         verts = verts * obj_s.unsqueeze(1).unsqueeze(1)
         return verts
 
+    @staticmethod
     def decopose_axis(self, rot, no_rand=False):
         """
         project 3x3 matrix to SO(3)
