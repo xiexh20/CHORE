@@ -371,7 +371,7 @@ class ReconFitterBase:
         return verts
 
     @staticmethod
-    def decopose_axis(self, rot, no_rand=False):
+    def decopose_axis(rot, no_rand=False):
         """
         project 3x3 matrix to SO(3)
         :param rot: (B, 3, 3), predicted/optimized rotation matrix
