@@ -94,6 +94,7 @@ After downloading the pretrained model, you can test one sequence from behave da
 ```shell
 python recon/recon_fit_behave.py chore-release --save_name chore-release -s [path to one sequence]
 ```
+To align reconstruction with input images for BEHAVE data, you will need to set `crop_cent` to False when using [this function](https://github.com/xiexh20/CHORE/blob/main/utils/render_utils.py#L202). 
 
 #### Evaluate 
 Run the following to compute errors reported in table 1: 
