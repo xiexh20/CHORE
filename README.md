@@ -36,7 +36,7 @@ Installing other dependencies:
 ```shell
 python -m pip install detectron2 -f   https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.6/index.html
 ```
-Update 2024 July: I realized that psbody-mesh library is not maintained anymore. The core function I used from that is the `Mesh` class for loading/export, and `MeshViewer` for fast visualization. If you don't need the visualizer, then you can simply copy the source code of the `Mesh` class and import `Mesh` from there. One example can be found here: https://github.com/xiexh20/ProciGen/blob/main/render/mesh.py
+Update 2024 July: I realized that psbody-mesh library is not maintained anymore. The core function I used from that is the `Mesh` class for loading/export, and `MeshViewer` for fast visualization. If you don't need the visualizer, then you can simply copy the source code of the `Mesh` class and import `Mesh` from there. One example can be found here: https://github.com/xiexh20/ProciGen/blob/main/render/mesh.py. Simply replace `from psbody.mesh import Mesh` with `from mesh import MyMesh as Mesh`.
 
 
 4. [Neural Mesh Renderer](https://github.com/JiangWenPL/multiperson/tree/master/neural_renderer): `pip install external/neural_renderer`
